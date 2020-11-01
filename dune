@@ -1,0 +1,6 @@
+(library
+ (name practice)
+ (inline_tests)
+ (modules arithmetic binary_search_tree)
+ (preprocess
+  (pps ppx_inline_test)))
