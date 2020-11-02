@@ -1,6 +1,6 @@
 (library
  (name practice)
  (inline_tests)
- (modules arithmetic binary_search_tree)
+ (modules arithmetic binary_search_tree ocaml_problems)
  (preprocess
   (pps ppx_inline_test)))

@@ -1,12 +1,7 @@
 (* type 'a tree = Empty | Node of 'a * 'a tree * 'a tree *)
 type 'a tree = 
     | Empty
-    | Node of 'a * 'a tree *'a tree
-
-(*for testing*)
-let a = Node(6, Node(3,Node(1, Empty, Empty),Node(5, Node(4, Empty, Empty), Empty)), Node(10, Empty, Empty))
-let b = Node(1, Node(2, Node(4, Empty, Empty), Node(5, Empty, Empty)), Node(3, Empty, Empty))
-let c = Node(8, Node(3, Empty, Empty), Node(10, Empty, Empty))
+    | Node of 'a * 'a tree * 'a tree
 
 (* string_of_binary_tree : ('a -> string) -> 'a tree -> string *)
 let rec string_of_binary_tree string_of_a tree =
