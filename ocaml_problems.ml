@@ -65,8 +65,37 @@ type 'a node =
 
 let rec flatten list =
  match list with 
- | [] -> []
- | One h::t -> a
- | Many l::t ->
+  [] -> []
+  | [One a] -> [a]
+  | [Many l] -> flatten l
+  | h::t ->  match h with 
+              One a -> a :: (flatten t)
+              | Many b -> (flatten b) @ (flatten t)
 
+let%test _ = flatten [ One "a" ; Many [ One "b" ; Many [ One "c" ; One "d" ] ; One "e" ] ] = ["a"; "b"; "c"; "d"; "e"]
+let%test _ = flatten [ One "a" ;One "e" ] = ["a"; "e"]
+
+(* 8: Eliminate consecutive duplicates of list elements. (medium) *)
+let rec compress list =
+ match list with 
+ | [] -> []
+ | [x] -> [x]
+ | h::t -> match t with 
+          | [] -> list
+          | h1::_ -> if (h = h1) then compress t else h :: compress t
+
+let%test _ = compress ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] = ["a"; "b"; "c"; "a"; "d"; "e"]
+let%test _ = compress ["a"; "b"; "c"; "a"; "d"; "e"] = ["a"; "b"; "c"; "a"; "d"; "e"]
+
+(* 9: Pack consecutive duplicates of list elements into sublists. (medium) *)
+let rec pack list =
+ match list with 
+ | [] -> []
+ | [x] -> [[x]]
+ | h::t -> match t with 
+          | [] -> [[h]]
+          | h1::_ -> if (h = h1) then (h::h1) @ (pack t) else [h] @ (pack t)
+
+
+let%test _ = pack ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"d";"e";"e";"e";"e"] = [["a"; "a"; "a"; "a"]; ["b"]; ["c"; "c"]; ["a"; "a"]; ["d"; "d"];["e"; "e"; "e"; "e"]]
 
