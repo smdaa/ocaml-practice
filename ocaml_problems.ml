@@ -87,15 +87,32 @@ let rec compress list =
 let%test _ = compress ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] = ["a"; "b"; "c"; "a"; "d"; "e"]
 let%test _ = compress ["a"; "b"; "c"; "a"; "d"; "e"] = ["a"; "b"; "c"; "a"; "d"; "e"]
 
-(* 9: Pack consecutive duplicates of list elements into sublists. (medium) *)
-let rec pack list =
+(* 10: Run-length encoding of a list. (easy) *)
+let encode list =
+  let rec aux count acc list= 
+    match list with 
+    [] -> []
+    |[x] -> (count+1, x) :: acc
+    | a::(b::_ as t) -> if (a = b) then aux (count + 1) acc t else aux 0 ((count+1, a)::acc) t
+  in List.rev (aux 0 [] list)
+
+let%test _ = encode ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] = [(4, "a"); (1, "b"); (2, "c"); (2, "a"); (1, "d"); (4, "e")]
+
+(* 14: Duplicate the elements of a list. (easy) *)
+let rec duplicate list =
  match list with 
- | [] -> []
- | [x] -> [[x]]
- | h::t -> match t with 
-          | [] -> [[h]]
-          | h1::_ -> if (h = h1) then (h::h1) @ (pack t) else [h] @ (pack t)
+ [] -> []
+ | h::t -> h::h::duplicate t
+
+let%test _ = duplicate ["a";"b";"c";"c";"d"] = ["a"; "a"; "b"; "b"; "c"; "c"; "c"; "c"; "d"; "d"]
+
+(* 15: Replicate the elements of a list a given number of times. (medium) *)
+let rec replicate list n =
 
 
-let%test _ = pack ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"d";"e";"e";"e";"e"] = [["a"; "a"; "a"; "a"]; ["b"]; ["c"; "c"]; ["a"; "a"]; ["d"; "d"];["e"; "e"; "e"; "e"]]
+let%test _ = replicate ["a";"b";"c"] 3 = ["a"; "a"; "a"; "b"; "b"; "b"; "c"; "c"; "c"]
+
+
+
+
 
