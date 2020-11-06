@@ -106,11 +106,31 @@ let rec duplicate list =
 
 let%test _ = duplicate ["a";"b";"c";"c";"d"] = ["a"; "a"; "b"; "b"; "c"; "c"; "c"; "c"; "d"; "d"]
 
-(* 15: Replicate the elements of a list a given number of times. (medium) *)
-let rec replicate list n =
+(* 17: Split a list into two parts; the length of the first part is given. (easy) *)
+let rec split list n =
+  match list with 
+   | [] -> [],[]
+   | h::t -> if (n=1) then [h],t else 
+              (h::(fst(split t (n-1))), snd(split t (n-1)))
+
+let%test _ = split ["a";"b";"c";"d";"e";"f";"g";"h";"i";"j"] 3 = (["a"; "b"; "c"], ["d"; "e"; "f"; "g"; "h"; "i"; "j"])
+let%test _ = split ["a";"b";"c";"d"] 5 = (["a"; "b"; "c"; "d"], [])
+
+(* 18: Extract a slice from a list. (medium) *)
+let rec slice list i k =
+ match list with
+  | [] -> []
+  | h::t -> if (k = 0) then [h] else
+            if (i = 0) then h::(slice t i (k-1)) else (slice t (i - 1) (k - 1))
+
+let%test _ = slice ["a";"b";"c";"d";"e";"f";"g";"h";"i";"j"] 2 6 = ["c"; "d"; "e"; "f"; "g"]
+
+(* 19: Rotate a list N places to the left. (medium) *)
+let rotate list n =
+  let slice1,slice2 = split list n in slice2@slice1 
 
 
-let%test _ = replicate ["a";"b";"c"] 3 = ["a"; "a"; "a"; "b"; "b"; "b"; "c"; "c"; "c"]
+let%test _ = rotate ["a"; "b"; "c"; "d"; "e"; "f"; "g"; "h"] 3 = ["d"; "e"; "f"; "g"; "h"; "a"; "b"; "c"]
 
 
 
