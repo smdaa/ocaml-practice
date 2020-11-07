@@ -129,10 +129,62 @@ let%test _ = slice ["a";"b";"c";"d";"e";"f";"g";"h";"i";"j"] 2 6 = ["c"; "d"; "e
 let rotate list n =
   let slice1,slice2 = split list n in slice2@slice1 
 
-
 let%test _ = rotate ["a"; "b"; "c"; "d"; "e"; "f"; "g"; "h"] 3 = ["d"; "e"; "f"; "g"; "h"; "a"; "b"; "c"]
 
+(* 20: Remove the K'th element from a list. (easy) *)
+let rec remove_at k list =
+ match list with 
+  | [] -> []
+  | h::t -> if (k=0) then t else h::(remove_at (k-1) t)
 
+let%test _ = remove_at 1 ["a";"b";"c";"d"] = ["a"; "c"; "d"]
 
+(* 21: Insert an element at a given position into a list. (easy) *)
+let rec insert_at x k list =
+ match list with 
+  | [] -> [x]
+  | h::t -> if (k=0) then x::h::t else h::(insert_at x (k-1) t)
 
+let%test _ = insert_at "alfa" 1 ["a";"b";"c";"d"] = ["a"; "alfa"; "b"; "c"; "d"]
+let%test _ = insert_at "alfa" 3 ["a";"b";"c";"d"] = ["a"; "b"; "c"; "alfa"; "d"]
+let%test _ = insert_at "alfa" 4 ["a";"b";"c";"d"] = ["a"; "b"; "c"; "d"; "alfa"]
 
+(* 22: Create a list containing all integers within a given range. (easy) *)
+let rec range x y =
+ if (x = y) then [x] else
+  if (x < y) then x::(range (x+1) y) else x::(range (x-1) y)
+
+let%test _ = range 4 9 = [4; 5; 6; 7; 8; 9]
+let%test _ = range 9 4 = [9; 8; 7; 6; 5; 4]
+
+(* 23: Extract a given number of randomly selected elements from a list. (medium) *)
+let rec rand_select list n =
+ if (n >= length list) then list else 
+ match list with 
+  | [] -> []
+  | h::t -> if (n = 0) then [] else let random = Random.int 2 in 
+            if (random = 1) then h::(rand_select t (n-1)) else (rand_select t (n))
+
+let%test _ = length (rand_select ["a";"b";"c";"d";"e";"f";"g";"h"] 3) = 3
+let%test _ = length (rand_select ["a";"b";"c";"d";"e";"f";"g";"h"] 5) = 5
+let%test _ = rand_select ["a";"b";"c";"d";"e";"f";"g";"h"] 20 = ["a";"b";"c";"d";"e";"f";"g";"h"]
+
+(* 24: Lotto: Draw N different random numbers from the set 1..M. (easy) *)
+let lotto_select n m = rand_select (range 1 m) n
+
+(* 25: Generate a random permutation of the elements of a list *)
+let rec permutation list =
+ match list with 
+  | [] -> []
+  | [x] -> [x]
+  | [x; y] -> if (Random.int 2 = 1) then [y; x] else [x; y]
+  | h::t -> if (Random.int 2 = 1) then (permutation t)@[h] else h::(permutation t)
+
+(* 26: Generate the combinations of K distinct objects chosen from the N elements of a list. (medium) *)
+let rec extract n list =
+ if (n <= 0) then [[]] else 
+ match list with 
+  | [] -> []
+  | h::t -> (List.map (fun l -> h :: l) (extract (n-1) t)) @ (extract n t)
+
+let%test _ = extract 2 ["a";"b";"c";"d"] = [["a"; "b"]; ["a"; "c"]; ["a"; "d"]; ["b"; "c"]; ["b"; "d"]; ["c"; "d"]]
