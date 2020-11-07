@@ -188,3 +188,37 @@ let rec extract n list =
   | h::t -> (List.map (fun l -> h :: l) (extract (n-1) t)) @ (extract n t)
 
 let%test _ = extract 2 ["a";"b";"c";"d"] = [["a"; "b"]; ["a"; "c"]; ["a"; "d"]; ["b"; "c"]; ["b"; "d"]; ["c"; "d"]]
+
+(* 95: English number words. (medium) *)
+let rec full_words n =
+ let num2txt n = 
+  match n with 
+   | 0 -> "zero"
+   | 1 -> "one"
+   | 2 -> "two"
+   | 3 -> "three"
+   | 4 -> "four"
+   | 5 -> "five"
+   | 6 -> "six"
+   | 7 -> "seven"
+   | 8 -> "eight"
+   | 9 -> "nine"
+   | _ -> failwith "greater than 9" in 
+ if (n <= 9) then (num2txt n) else String.concat "-" [full_words (n/10); num2txt (n mod 10)]
+
+let%test _ = full_words 175 = "one-seven-five"
+let%test _ = full_words 23485 = "two-three-four-eight-five"
+let%test _ = full_words 0 = "zero"
+
+(* 96: Syntax checker. (medium) *)
+let rec identifier string =
+ match string with 
+  | "" -> false 
+  | string -> let h = (String.get string 0) in 
+              let t = (String.sub string 1 ( (String.length string)-1)) in
+              if (h = '-') then false else identifier t
+
+let%test _ = identifier "this-is-a-long-identifier" = true
+let%test _ = identifier "this-ends-in-" = false
+let%test _ = identifier "two--hyphens" = false
+let%test _ = identifier "-dash-first" = false
