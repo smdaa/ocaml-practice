@@ -192,8 +192,8 @@ let%test _ = extract 2 ["a";"b";"c";"d"] = [["a"; "b"]; ["a"; "c"]; ["a"; "d"]; 
 
 (* 95: English number words. (medium) *)
 let rec full_words n =
- let num2txt n = 
-  match n with 
+ let num2txt n =
+  match n with
    | 0 -> "zero"
    | 1 -> "one"
    | 2 -> "two"
@@ -204,7 +204,7 @@ let rec full_words n =
    | 7 -> "seven"
    | 8 -> "eight"
    | 9 -> "nine"
-   | _ -> failwith "greater than 9" in 
+   | _ -> failwith "greater than 9" in
  if (n <= 9) then (num2txt n) else String.concat "-" [full_words (n/10); num2txt (n mod 10)]
 
 let%test _ = full_words 175 = "one-seven-five"
@@ -309,4 +309,5 @@ let initial_board =
                    [0; 0; 0;  0; 0; 6;  0; 9; 1];
                    [2; 4; 0;  0; 0; 1;  5; 0; 0]];;
 
+Board.print (initial_board);
 Board.print (sudoku initial_board)
