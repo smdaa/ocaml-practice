@@ -309,5 +309,173 @@ let initial_board =
                    [0; 0; 0;  0; 0; 6;  0; 9; 1];
                    [2; 4; 0;  0; 0; 1;  5; 0; 0]];;
 
-Board.print (initial_board);
-Board.print (sudoku initial_board)
+(* http://wwwperso.insa-toulouse.fr/~lebotlan/Y/OCaml/exercises2.html *)
+let rec switch l =
+  match l with 
+  | [] -> []
+  | [x] -> [x]
+  | h1::h2::t -> h2::h1::(switch t)
+
+let%test _ = switch [] = []
+let%test _ = switch [1] = [1]
+let%test _ = switch [1;2] = [2;1]
+let%test _ = switch [1;2;3] = [2;1;3]
+let%test _ = switch [1;2;3;4] = [2;1;4;3]
+
+let rec unpair l = 
+  match l with 
+  | [] -> []
+  | (h1,h2)::t -> h1::h2::(unpair t)
+
+let unpair2 l = List.fold_right (fun (h1, h2) acc -> h1::h2::acc) l []
+
+let%test _ = unpair2 [] = []
+let%test _ = unpair [] = []
+let%test _ = unpair2 [(1,2)] = [1;2]
+let%test _ = unpair [(1,2)] = [1;2]
+let%test _ = unpair2 [(1,2);(3,4)] = [1;2;3;4]
+let%test _ = unpair [(1,2);(3,4)] = [1;2;3;4]
+
+let rec remove_succ l = 
+  match l with 
+  | [] -> []
+  | [x] -> [x]
+  | h1::h2::t -> if h2 = h1 + 1 then (remove_succ (h2::t)) else (h1::(remove_succ (h2::t)))
+
+let%test _ = remove_succ [ 10 ; 20 ; 21 ; 22 ; 23 ; 24; 100 ; 101 ; 110 ] = [10; 24; 101; 110]
+let%test _ = remove_succ [ 20 ; 21 ; 22 ; 21 ; 22 ; 23 ] = [22; 23]
+
+let rec combine l1 l2 = 
+  match l1,l2 with 
+  | [],[] -> []
+  | [],_ -> failwith "..."
+  | _,[] -> failwith "..."
+  | h1::t1,h2::t2 -> (h1,h2)::(combine t1 t2)
+
+let rec keep l1 l2 = 
+  match l1,l2 with 
+  | [],[] -> []
+  | [],_ -> failwith "..."
+  | _,[] -> failwith "..."
+  | h1::t1,h2::t2 -> if h2 then h1::(keep t1 t2) else (keep t1 t2)
+
+let rec map2 f l1 l2 = 
+  match l1,l2 with 
+  | [],[] -> []
+  | [],_ -> failwith "..."
+  | _,[] -> failwith "..."
+  | h1::t1,h2::t2 -> (f h1 h2)::(map2 f t1 t2) 
+
+let rec interleave l1 l2 = 
+  match l1,l2 with 
+  | [],[] -> []
+  | _,[] -> l1
+  | [],_ -> l2
+  | h1::t1,h2::t2 -> h1::h2::(interleave t1 t2)
+
+type bool3 = BTrue | BFalse | Unknown
+
+let and3 b1 b2 = 
+  match b1,b2 with 
+  | BTrue,BTrue -> BTrue
+  | BTrue,Unknown -> Unknown
+  | _ -> BFalse
+
+let not3 b = 
+  match b with 
+  | BTrue -> BFalse
+  | BFalse -> BTrue
+  | Unknown -> Unknown
+
+type instruction = Plus of int | Mul of int
+
+let apply_instruction n i = 
+  match i with 
+  | Plus a -> n + a
+  | Mul a -> n * a
+
+let rec apply_instructions n li = 
+  match li with 
+  | [] -> n
+  | h::t -> apply_instructions (apply_instruction n h) t
+
+let to_funi i = 
+  match i with 
+  | Plus a -> (fun x -> a + x)
+  | Mul a -> (fun x -> a * x)
+
+let to_funlist li = List.map to_funi li
+
+let rec compact li = 
+  match li with 
+  | [] -> []
+  | [x] -> [x]
+  | h1::h2::t -> 
+    begin 
+      match h1,h2 with 
+      | Plus a1,Plus a2 -> (Plus (a1 + a2))::(compact t)
+      | Mul a1,Mul a2 -> (Mul (a1 * a2))::(compact t)
+      | _ -> h1::(compact (h2::t))
+    end
+
+let to_string_i s i = 
+  match i with 
+  | Plus a -> "(" ^ s ^ " + " ^ (string_of_int a) ^ ")"
+  | Mul a -> "(" ^s ^ " * " ^ (string_of_int a) ^ ")"
+
+let rec to_string s li = 
+  match li with 
+  | [] -> s
+  | h::t -> to_string (to_string_i s h) t
+
+type 'a element = Single of 'a | Pair of 'a * 'a
+type 'a fonct = One_arg of ('a -> 'a) | Two_args of ('a -> 'a -> 'a)
+
+let taille_element e = 
+  match e with 
+  | Single _ -> 1
+  | Pair _ -> 2
+
+let count_elements le = List.fold_right (fun e acc -> acc + taille_element e) le 0
+
+let apply f e =
+  match f e with 
+  | One_arg f1, Single a -> f1 a
+  | Two_args f2, Pair (a, b) -> f2 a b
+  | _,_ -> failwith "..."
+
+(* exam 2k18 *)
+
+type 'a app_list = Nil | Append of 'a app_list * 'a app_list | Cons of 'a * 'a app_list
+
+let rec map_app f l =
+  match l with 
+  | Nil -> Nil
+  | Cons (a, l1) -> Cons (f a, map_app f l1)
+  | Append(l1, l2) -> Append(map_app f l1, map_app f l2)
+
+let rec rev_app l =
+  match l with 
+  | Nil -> Nil
+  | Cons(h, t) -> Append(rev_app t, Cons(h, Nil))
+  | Append(l, r) -> Append(rev_app r,rev_app l)
+
+let rec fold_right_app f l e = 
+  match l with 
+  | Nil -> e
+  | Cons(h, t) -> f h (fold_right_app f t e)
+  | Append(l,r) -> fold_right_app f l (fold_right_app f r e)
+
+let rec to_list al = 
+  match al with 
+  | Nil ->  []
+  | Cons(h,t) -> h::(to_list t)
+  | Append(l, r) -> (to_list l) @ (to_list r)
+
+let rec to_list_aux al acc = 
+  match al with 
+  | Nil -> acc
+  | Cons(h, t) -> h::(to_list_aux t acc)
+  | Append(l,r) -> to_list_aux l (to_list_aux r acc)
+
+
