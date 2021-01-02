@@ -85,8 +85,41 @@ struct
     | Empty
     | Node of td * (tid * arbre_reecriture) list 
 
-  let creer_noeud ch = failwith "TODO"
-  let racine ar = failwith "TODO"
-  let fils ar = failwith "TODO"
-  let appartient ch ar = failwith "TODO"
+  let creer_noeud ch = 
+    let rec aux i li = 
+      match li with 
+      | [] -> []
+      | h::t -> (i, Node(h, []))::(aux i t) 
+    in
+    let l1 = Regle1.appliquer ch in
+    let l2 = Regle2.appliquer ch in
+    let l3 = Regle3.appliquer ch in
+    let l4 = Regle4.appliquer ch in
+    Node (ch, (aux 1 l1) @ (aux 2 l2) @ (aux 3 l3) @ (aux 4 l4))
+
+  let racine ar = 
+    match ar with 
+    | Empty -> []
+    | Node(ch,_) -> ch
+
+  let fils ar = 
+    match ar with 
+    | Empty -> []
+    | Node(_,lch) -> lch
+
+  let rec appartient ch ar = 
+    match ar with 
+    | Empty -> false
+    | Node(x, lx) -> if ch = x then true else 
+                      let l = List.map (appartient ch) (snd (List.split lx)) 
+                        in (List.fold_right (fun x acc -> x || acc) l false)
+end
+
+module SystemeBOA =
+struct
+  open ArbreReecritureBOA
+
+  let construit_arbre n ch = failwith "TODO"
+
+  
 end

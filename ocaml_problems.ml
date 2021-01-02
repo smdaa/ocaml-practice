@@ -479,3 +479,105 @@ let rec to_list_aux al acc =
   | Append(l,r) -> to_list_aux l (to_list_aux r acc)
 
 
+(* https://perso.crans.org/besson/teach/agreg-2017/TP_Programmation_2017-18/TP2__OCaml.pdf *)
+
+let taille l = List.fold_right (fun _ acc -> 1 + acc) l 0
+
+let rec concatene l1 l2 = 
+  match l1 with 
+  | [] -> l2 
+  | h1::t1 -> h1 :: (concatene t1 l2)
+
+let rec appartient x l = 
+  match l with 
+  | [] -> false 
+  | h::t -> if x=h then true else appartient x t
+
+let miroir l =
+  let rec aux l acc = 
+    match l with 
+    | [] -> acc 
+    | h::t -> aux t (h::acc)
+  in aux l []
+
+let rec alterne l1 l2 = 
+  match l1 with 
+  | [] -> l2
+  | h1::t1 -> h1::(alterne l2 t1)
+
+let nb_occurrences n l =
+  let rec aux n l acc =
+    match l with 
+    | [] -> acc
+    | h::t -> if h=n then aux n t (acc+1) else aux n t acc
+  in aux n l 0
+
+let nb_occurrences_1 n l = List.fold_right (fun h acc -> if h = n then acc+1 else acc) l 0
+
+let pairs l = 
+  let rec aux l acc= 
+    match l with 
+    | [] -> acc
+    | h::t -> if (h mod 2 = 0) then aux t (acc @ [h]) else aux t acc
+  in aux l []
+
+let range n =
+  let rec aux n acc =
+    match n with 
+    | 0 -> acc
+    | _ -> aux (n-1) acc @ [n]
+  in aux n []
+
+let range2 a b s =
+  let rec aux a b s acc = 
+    if a = b then acc
+    else if a > b then failwith "..."
+    else if (a+s) > b then acc @ [a]
+    else aux (a+s) b s (acc @ [a])
+  in aux a b s []
+
+let applique f l = 
+  let rec aux f l acc = 
+    match l with 
+    | [] -> acc
+    | h::t -> aux f t (acc @ [(f h)])
+  in aux f l []
+
+let rec itere f l =
+  match l with 
+  | [] -> ()
+  | h::t -> let () = f h in itere f t 
+
+let rec qqsoit f l =
+  match l with 
+  | [] -> true 
+  | h::t -> (f h) && (qqsoit f t)
+
+let rec ilexiste f l =
+  match l with 
+  | [] -> false 
+  | h::t -> (f h) || (ilexiste f t)
+
+let filtre f l =
+  let rec aux f l acc =
+    match l with 
+    | [] -> acc 
+    | h::t -> if f h then aux f t (acc @ [h]) else aux f t acc 
+  in aux f l []
+
+type 'a arbre_bin0 =  Feuille0 of 'a | Noeud0 of ('a arbre_bin0) * 'a * ('a arbre_bin0)
+
+let rec arbre_complet_entier n =
+  match n with 
+  | n when n < 2 -> Feuille0 0
+  | n -> Noeud0 (arbre_complet_entier (n / 2), n, arbre_complet_entier (n / 2))
+
+type arbre_bin = Feuille | Noeud of arbre_bin * arbre_bin;;
+
+let arbre_test = Noeud (Noeud (Noeud (Feuille, Feuille), Feuille), Feuille);;
+
+let rec taille ar = 
+  match ar with 
+  | Feuille -> 1
+  | Noeud(ar1, ar2) -> 1 + (taille ar1) + (taille ar2) 
+ 
